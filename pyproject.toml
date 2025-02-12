@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "torchprofile"
+version = "0.1.0"
+description = "A profiling tool for PyTorch models"
+authors = [
+    { name = "Zhijian Liu" }
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy>=2",
+    "torch>=2",
+    "torchvision>=0.15",
+]
+
+[project.urls]
+Homepage = "https://github.com/zhijian-liu/torchprofile/"
+Repository = "https://github.com/zhijian-liu/torchprofile/"
+
+[tool.setuptools]
+packages = { find = { exclude = ["examples"] } }
