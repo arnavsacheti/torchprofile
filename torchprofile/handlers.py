@@ -1,29 +1,30 @@
 from .utils import math
+from .utils.ir import Node
 
 __all__ = ['handlers']
 
 
-def addmm(node):
+def addmm(node: Node):
     # [n, p] = aten::addmm([n, p], [n, m], [m, p], *, *)
     n, m = node.inputs[1].shape
     m, p = node.inputs[2].shape
     return n * m * p
 
 
-def addmv(node):
+def addmv(node: Node):
     # [n] = aten::addmv([n], [n, m], [m], *, *)
     n, m = node.inputs[1].shape
     return n * m
 
 
-def bmm(node):
+def bmm(node: Node):
     # [b, n, p] = aten::bmm([b, n, m], [b, m, p])
     b, n, m = node.inputs[0].shape
     b, m, p = node.inputs[1].shape
     return b * n * m * p
 
 
-def baddbmm(node):
+def baddbmm(node: Node):
     # [b, n, p] = aten::baddbmm([b, n, p], [b, n, m], [b, m, p])
     b, n, p = node.inputs[0].shape
     b, n1, m = node.inputs[1].shape
@@ -32,7 +33,7 @@ def baddbmm(node):
     return b * n * m * p
 
 
-def matmul(node):
+def matmul(node: Node):
     if node.inputs[0].ndim == 1 and node.inputs[1].ndim == 1:
         # [] = aten::matmul([n], [n])
         n = node.inputs[0].shape[0]
@@ -66,12 +67,12 @@ def matmul(node):
         return math.prod(b) * n * m * p
 
 
-def mul(node):
+def mul(node: Node):
     os = node.outputs[0].shape
     return math.prod(os)
 
 
-def convolution(node):
+def convolution(node: Node):
     if node.outputs[0].shape[1] == node.inputs[1].shape[0]:
         oc, ic, *ks = node.inputs[1].shape
     else:
@@ -80,7 +81,7 @@ def convolution(node):
     return math.prod(os) * ic * math.prod(ks)
 
 
-def norm(node):
+def norm(node: Node):
     if node.operator in ['aten::batch_norm', 'aten::instance_norm']:
         affine = node.inputs[1].shape is not None
     elif node.operator in ['aten::layer_norm', 'aten::group_norm']:
@@ -92,21 +93,21 @@ def norm(node):
     return math.prod(os) if affine else 0
 
 
-def avg_pool_or_mean(node):
+def avg_pool_or_mean(node: Node):
     os = node.outputs[0].shape
     return math.prod(os)
 
 
-def leaky_relu(node):
+def leaky_relu(node: Node):
     os = node.outputs[0].shape
     return math.prod(os)
 
 
-def upsample_bilinear2d(node):
+def upsample_bilinear2d(node: Node):
     os = node.outputs[0].shape
     return math.prod(os) * 4
 
-def scaled_dot_product_attention(node):
+def scaled_dot_product_attention(node: Node):
     b = node.inputs[0].shape[0]
     h = math.prod(node.inputs[0].shape[1:-2])
     l = node.inputs[0].shape[-2]
